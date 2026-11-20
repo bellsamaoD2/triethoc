@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triết C1 - Phần 1</title>
+<style>
+  body { font-family: sans-serif; background: #2c123c; color: #fff; padding: 15px; max-width: 700px; margin: auto; }
+  .box { background: #3f1b56; padding: 20px; border-radius: 12px; }
+  .top { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: #efa929; }
+  .q { font-size: 18px; margin-bottom: 15px; line-height: 1.4; }
+  button.opt { display: block; width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 8px; color: #fff; font-size: 15px; text-align: left; cursor: pointer; line-height: 1.4; }
+  .cA { background: #2d70ae; } .cB { background: #2d9da6; } .cC { background: #efa929; } .cD { background: #d5546d; }
+  .ok { background: #28a745 !important; } .no { background: #dc3545 !important; }
+  .nav { margin-top: 15px; display: flex; justify-content: space-between; }
+  .btn { padding: 10px 18px; border: none; border-radius: 6px; background: #8854c0; color: #fff; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="box" id="app">
+  <div class="top"><span id="num"></span><span id="pts">Điểm: 0</span></div>
+  <div class="q" id="q"></div>
+  <div id="opts"></div>
+  <div class="nav">
+    <button class="btn" onclick="mix()">🔀 Xáo trộn</button>
+    <button class="btn" id="nxt" style="background:#00c985; display:none;" onclick="next()">Tiếp theo ➔</button>
+  </div>
+</div>
+
+<script>
+const data = [
+  { cau: "Hình thức nào dưới đây được xem là đỉnh cao của phép biện chứng?", a: "Logic học của A-ri-xtốt.", b: "Phép biện chứng thời cổ đại.", c: "Thuật ngụy biện trong thời kỳ trung cổ.", d: "Phép biện chứng duy vật Mác - Lênin.", dung: "D" },
+  { cau: "Trong các yếu tố sau, yếu tố nào quy định bản chất của thế giới quan tôn giáo?", a: "Thái độ.", b: "Niềm tin.", c: "Lý tưởng.", d: "Tri thức.", dung: "B" },
+  { cau: "Theo quan niệm của các triết gia Hy Lạp cổ đại, triết học là gì?", a: "Khoa học về vũ trụ.", b: "Khoa học về tự nhiên.", c: "Khoa học của các khoa học.", d: "Khoa học về xã hội.", dung: "C" },
+  { cau: "Chọn phương án đúng nhất: Triết học nghiên cứu loại quy luật gì?", a: "Quy luật của xã hội.", b: "Quy luật chung nhất của tự nhiên, xã hội và tư duy.", c: "Quy luật của tự nhiên.", d: "Quy luật của tư duy.", dung: "B" },
+  { cau: "Nghĩa tổng quát của thuật ngữ 'triết học' theo người Hy Lạp cổ đại là gì?", a: "Tình yêu thần thánh.", b: "Yêu quý thiên nhiên.", c: "Yêu mến sự thông thái.", d: "Tình yêu cuộc sống.", dung: "C" },
+  { cau: "Học thuyết nào sau đây cho rằng thế giới ra đời từ hai bản nguyên: vật chất và tinh thần?", a: "Chủ nghĩa đa nguyên.", b: "Chủ nghĩa hư vô.", c: "Chủ nghĩa nhị nguyên.", d: "Chủ nghĩa nhất nguyên.", dung: "C" },
+  { cau: "Hãy xác định đúng hai trường phái chính của triết học?", a: "Chủ nghĩa đa nguyên và chủ nghĩa nhị nguyên.", b: "Chủ nghĩa duy cảm và chủ nghĩa duy lý.", c: "Chủ nghĩa duy vật và chủ nghĩa duy tâm.", d: "Chủ nghĩa tương đối và chủ nghĩa hoài nghi.", dung: "C" },
+  { cau: "Triết học ra đời vào khoảng thời gian nào sau đây?", a: "Thế kỷ thứ V đến thế kỷ thứ IV trước công nguyên.", b: "Thế kỷ thứ I sau công nguyên.", c: "Thế kỷ thứ III đến thế kỷ thứ I trước công nguyên.", d: "Thế kỷ thứ VIII đến thế kỷ thứ VI trước công nguyên.", dung: "D" },
+  { cau: "'Chỉ nhìn thấy cây mà không thấy rừng' là nhận xét của Ăngghen về phương pháp triết học nào?", a: "Phương pháp khái quát hóa.", b: "Phương pháp trừu tượng hóa.", c: "Phương pháp siêu hình.", d: "Phương pháp biện chứng.", dung: "C" },
+  { cau: "Đâu là hạt nhân của thế giới quan?", a: "Luật pháp.", b: "Chính trị.", c: "Đạo đức.", d: "Triết học.", dung: "D" },
+  { cau: "Điều kiện để triết học ra đời khi nào?", a: "Khi con người xuất hiện và có nhu cầu tìm hiểu thế giới xung quanh.", b: "Khi khoa học tự nhiên phát triển và con người cần có tri thức khái quát.", c: "Khi xã hội xuất hiện nhà nước, giai cấp và cần có hệ thống tri thức khái quát cao.", d: "Khi tri thức con người đạt đến trình độ nhất định, tư duy đạt trình độ khái quát hóa, trừu tượng hóa; xã hội có sự phân công lao động và phân chia giai cấp xuất hiện.", dung: "D" },
+  { cau: "Ai là người đầu tiên thống nhất giữa chủ nghĩa duy vật với phép biện chứng?", a: "Hêghen.", b: "Phoiơbắc.", c: "Mác và Ăngghen.", d: "Lênin.", dung: "C" },
+  { cau: "Đối tượng nghiên cứu của triết học Mác - Lênin là gì?", a: "Nghiên cứu quy luật xã hội.", b: "Nghiên cứu mối quan hệ giữa vật chất và ý thức.", c: "Nghiên cứu về mối quan hệ giữa vật chất và ý thức, về những quy luật vận động, phát triển chung nhất của tự nhiên, xã hội và tư duy.", d: "Nghiên cứu con người.", dung: "C" },
+  { cau: "Một trong ba vai trò chính của triết học Mác - Lênin?", a: "Giúp con người trong nhận thức và thực tiễn.", b: "Định hướng tư tưởng cho con người trong nhận thức và thực tiễn.", c: "Thế giới quan, phương pháp luận khoa học, cách mạng cho con người trong nhận thức và thực tiễn.", d: "Giáo dục con người trong nhận thức và thực tiễn.", dung: "C" },
+  { cau: "Điều gì đã gắn kết hai nhà triết học Phuriê và Xanh Ximông?", a: "Đều sáng lập chủ nghĩa duy lý cận đại.", b: "Đều sáng lập chủ nghĩa xã hội khoa học.", c: "Đều sáng lập chủ nghĩa xã hội không tưởng Pháp.", d: "Đều sáng lập chủ nghĩa duy tâm Pháp.", dung: "C" },
+  { cau: "Triết học Mác - Lênin ra đời vào thời gian nào?", a: "Những năm 30 thế kỷ XIX.", b: "Những năm 60 thế kỷ XIX.", c: "Những năm 40 thế kỷ XIX.", d: "Những năm 50 thế kỷ XIX.", dung: "C" },
+  { cau: "Vì sao triết học Mác gọi là hệ thống triết học mở?", a: "Mở ra con đường giải phóng con người.", b: "Không phải học thuyết đã xong xuôi, cần tiếp tục bổ sung, hoàn thiện, phát triển.", c: "Mở ra phương pháp nhận thức và cải tạo thế giới.", d: "Mở ra thời kỳ mới.", dung: "B" },
+  { cau: "Chủ nghĩa Mác được truyền bá mạnh mẽ vào nước Nga trong giai đoạn nào?", a: "Những năm 60 của thế kỷ XIX.", b: "Những năm 70 đầu thế kỷ XX.", c: "Những năm 90 của thế kỷ XIX.", d: "Những năm 80 của thế kỷ XIX.", dung: "D" },
+  { cau: "Sau khi Mác và Ăngghen qua đời, triết học Mác do ai bổ sung và phát triển?", a: "Ăngghen.", b: "Lênin, các Đảng Cộng sản và công nhân trên thế giới.", c: "Lênin.", d: "Ăngghen và Lênin.", dung: "B" },
+  { cau: "Thời kỳ đầu trong sự phát triển tư tưởng triết học, triết gia nào được C. Mác xem là chân lý?", a: "Cantơ.", b: "Senlinh.", c: "Hêghen.", d: "Phoiơbắc.", dung: "C" },
+  { cau: "Triết học Mác kế thừa trực tiếp tiền đề lý luận nào?", a: "Triết học Hy Lạp cổ đại.", b: "Triết học Tây Âu thời trung cổ.", c: "Triết học cổ điển Đức.", d: "Triết học phương Tây hiện đại.", dung: "C" },
+  { cau: "Hãy chỉ ra một trong những đại diện của 'Chủ nghĩa xã hội không tưởng Pháp'?", a: "Xpinôza.", b: "Vônte.", c: "Đềcactơ.", d: "Phuriê.", dung: "D" },
+  { cau: "Chọn phương án đúng nhất: Những phát minh nào của khoa học tự nhiên làm cơ sở khoa học cho sự ra đời của triết học Mác - Lênin?", a: "Định luật bảo toàn và chuyển hoá năng lượng, học thuyết tế bào, học thuyết tiến hoá.", b: "Thuyết mặt trời là trung tâm của vũ trụ, định luật bảo toàn và chuyển hoá năng lượng, thuyết tiến hoá.", c: "Phát hiện ra nguyên tử, phát hiện ra điện tử, định luật bảo toàn và chuyển hoá năng lượng.", d: "Thuyết tiến hoá, phát hiện ra nguyên tử, học thuyết tế bào.", dung: "A" },
+  { cau: "Mặt thứ hai vấn đề cơ bản của triết học trả lời câu hỏi gì?", a: "Mối quan hệ giữa vật chất và ý thức?", b: "Con người có thể nhận thức được thế giới hay không?", c: "Mối quan hệ giữa tư duy và tồn tại?", d: "Vật chất có trước hay ý thức có trước?", dung: "B" },
+  { cau: "Triết học nào ở thời kỳ cổ đại được coi là 'khoa học của khoa học'?", a: "Triết học Ai Cập.", b: "Triết học Ấn Độ.", c: "Triết học Hy Lạp.", d: "Quy luật của xã hội.", dung: "C" },
+  { cau: "Chủ nghĩa duy vật thời kỳ cận đại ở phương Tây mang đặc trưng gì?", a: "Tầm thường.", b: "Siêu hình.", c: "Chất phác.", d: "Biện chứng.", dung: "B" },
+  { cau: "Mác đã kế thừa trực tiếp những giá trị duy vật của triết gia nào?", a: "Hêghen.", b: "Cantơ.", c: "Senling.", d: "Phoiơbắc.", dung: "D" },
+  { cau: "Vì sao Mác và Ăngghen sáng lập mà triết học được gọi là triết học Mác - Lênin?", a: "Mác sáng lập, Lênin vận dụng thành công.", b: "Mác và Lênin cùng sáng lập.", c: "Mác sáng lập, Lênin giáo dục, truyền bá.", d: "Mác sáng lập, Lênin bảo vệ và phát triển.", dung: "D" },
+  { cau: "C. Mác và Ph. Ăngghen đề xuất những nguyên lý triết học duy vật biện chứng và duy vật lịch sử trong giai đoạn nào?", a: "1848 - 1893", b: "1841 - 1844", c: "1844 - 1848", d: "1848 - 1895", dung: "C" },
+  { cau: "Cơ sở phân chia triết học thành chủ nghĩa duy vật và chủ nghĩa duy tâm là dựa trên cách giải quyết nào?", a: "Mặt thứ hai vấn đề cơ bản của triết học.", b: "Vấn đề cơ bản của triết học.", c: "Vấn đề phương pháp luận của triết học.", d: "Mặt thứ nhất vấn đề cơ bản của triết học.", dung: "D" },
+  { cau: "Phép biện chứng duy vật do ai xây dựng?", a: "Hêghen.", b: "Cantơ.", c: "Mác và Ăngghen.", d: "Platon.", dung: "C" },
+  { cau: "Hệ thống quan niệm về thế giới, về con người và vai trò con người trong thế giới đó, gọi là gì?", a: "Thế giới quan.", b: "Nhận thức luận.", c: "Nhân sinh quan.", d: "Vũ trụ quan.", dung: "A" },
+  { cau: "'Triết học treo lơ lửng ở ngoài thế giới, cũng như bộ óc không tồn tại bên ngoài con người' là câu nói của ai?", a: "Hêraclit.", b: "Hêghen.", c: "Cantơ.", d: "C. Mác.", dung: "D" },
+  { cau: "Chọn phương án đúng: Tác phẩm nào đánh dấu sự ra đời của chủ nghĩa Mác - Lênin (trong đó có triết học Mác - Lênin)?", a: "Luận Cương về Phoiơbắc (1845).", b: "Bản thảo kinh tế - Triết học (1844).", c: "Hệ tư tưởng Đức (1846).", d: "Tuyên ngôn của Đảng Cộng sản (1848).", dung: "D" },
+  { cau: "Triết học Phoiơbắc thuộc về trường phái triết học nào?", a: "Duy tâm chủ quan.", b: "Duy tâm khách quan.", c: "Duy vật biện chứng.", d: "Duy vật siêu hình.", dung: "D" },
+  { cau: "Chọn phương án đúng: Một trong hai phát minh vĩ đại của Mác là gì?", a: "Chủ nghĩa duy vật biện chứng.", b: "Lý luận nhận thức.", c: "Chủ nghĩa duy vật lịch sử.", d: "Phép biện chứng duy vật.", dung: "C" },
+  { cau: "Triết học ra đời sớm nhất ở đâu?", a: "Ấn Độ, Châu Phi, Nga.", b: "Ấn Độ, Trung Quốc, Hy Lạp.", c: "Ai Cập, Ấn Độ, Trung Quốc.", d: "Trung Quốc, Ai Cập, Nga.", dung: "B" },
+  { cau: "Trình tự xuất hiện các hình thức thế giới quan trong lịch sử là như thế nào?", a: "Tôn giáo - huyền thoại - triết học.", b: "Huyền thoại - tôn giáo - triết học.", c: "Triết học - tôn giáo - huyền thoại.", d: "Huyền thoại - triết học - tôn giáo.", dung: "B" },
+  { cau: "Luận điểm: 'Cái gì tồn tại thì hợp lý, cái gì hợp lý thì tồn tại' là của nhà triết học nào?", a: "Arixtốt.", b: "Hêghen.", c: "Cantơ.", d: "Phoiơbắc.", dung: "B" },
+  { cau: "Chức năng cơ bản nhất của triết học Mác - Lênin là gì?", a: "Trang bị vũ khí lý luận cách mạng.", b: "Thế giới quan và phương pháp luận.", c: "Nhận thức và cải tạo thực tiễn.", d: "Định hướng tư duy và hành động.", dung: "B" },
+  { cau: "Nhận định nào là đúng về phủ định biện chứng (PĐBC)?", a: "PĐBC là sự phủ định do sự tác động của các sự vật.", b: "PĐBC là sự thay thế sự vật này bằng sự vật khác.", c: "PĐBC có tính khách quan, tính kế thừa, tính phổ biến, tính đa dạng, phong phú.", d: "PĐBC làm cho sự vật vận động thụt lùi, đi xuống.", dung: "C" },
+  { cau: "Khi đề cập tới vai trò của thực tiễn đối với nhận thức, nhận định nào dưới đây là KHÔNG đúng?", a: "Thực tiễn là động lực của nhận thức.", b: "Thực tiễn là hình thức của nhận thức.", c: "Thực tiễn là mục đích của nhận thức.", d: "Thực tiễn là cơ sở của nhận thức.", dung: "B" },
+  { cau: "Theo cách phân chia của Ph.Ăngghen, hình thức vận động nào dưới đây là thấp nhất?", a: "Vận động xã hội.", b: "Vận động sinh học.", c: "Vận động vật lý.", d: "Vận động hoá học.", dung: "C" },
+  { cau: "Theo quan điểm duy vật biện chứng, phản ánh nào dưới đây đạt tới hình thức cao nhất?", a: "Tâm lý.", b: "Sinh vật.", c: "Vật lý.", d: "Ý thức.", dung: "D" },
+  { cau: "Đặc điểm lý luận nhận thức mang tính siêu hình, máy móc là của trường phái triết học nào?", a: "Chủ nghĩa duy tâm chủ quan.", b: "Chủ nghĩa duy vật biện chứng.", c: "Chủ nghĩa duy vật trước Mác.", d: "Chủ nghĩa duy tâm khách quan.", dung: "C" },
+  { cau: "Chủ nghĩa duy vật biện chứng, quan niệm 'khái niệm' là gì?", a: "Một hình thức nhận thức thông thường.", b: "Một hình thức tư duy trừu tượng.", c: "Một hình thức nhận thức cảm tính.", d: "Một hình thức nhận thức kinh nghiệm.", dung: "B" },
+  { cau: "Sự thống nhất giữa lượng và chất trong phép biện chứng duy vật được thể hiện thông qua phạm trù nào?", a: "Bước nhảy.", b: "Điểm nút.", c: "Thuộc tính.", d: "Độ.", dung: "D" },
+  { cau: "Theo quan điểm của chủ nghĩa duy vật biện chứng, mối liên hệ phổ biến có tính chất gì?", a: "Tính chủ quan, tính ngẫu nhiên, tính lặp lại.", b: "Tính khách quan, tính đa dạng phong phú, tính kế thừa.", c: "Tính khách quan, tính phổ biến, tính kế thừa.", d: "Tính khách quan, tính phổ biến, tính đa dạng, phong phú.", dung: "D" },
+  { cau: "Trong lý luận về mâu thuẫn, quá trình đồng hóa và dị hóa trong cơ thể sống được gọi là gì?", a: "Hai mặt đối lập.", b: "Hai yếu tố.", c: "Hai quá trình.", d: "Các thuộc tính.", dung: "A" },
+  { cau: "Quan niệm cho rằng 'Óc tiết ra ý thức như gan tiết ra mật' là của trường phái triết học nào?", a: "Chủ nghĩa duy vật siêu hình.", b: "Chủ nghĩa duy vật biện chứng.", c: "Chủ nghĩa duy vật chất phác.", d: "Chủ nghĩa duy vật tầm thường.", dung: "D" },
+  { cau: "Ý thức là hình ảnh chủ quan của thế giới khách quan là quan niệm của trường phái triết học nào?", a: "Chủ nghĩa duy vật tầm thường.", b: "Chủ nghĩa duy vật chất phác.", c: "Chủ nghĩa duy vật siêu hình.", d: "Chủ nghĩa duy vật biện chứng.", dung: "D" },
+  { cau: "Trường phái triết học nào cho rằng thực tiễn là cơ sở chủ yếu và trực tiếp nhất của nhận thức?", a: "Chủ nghĩa duy tâm chủ quan.", b: "Chủ nghĩa duy vật biện chứng.", c: "Chủ nghĩa duy vật siêu hình.", d: "Chủ nghĩa duy tâm khách quan.", dung: "B" },
+  { cau: "Theo quan điểm của chủ nghĩa duy vật biện chứng, sự phát triển của các sự vật, hiện tượng có tính chất gì?", a: "Tính ngẫu nhiên, chủ quan.", b: "Tính khách quan, đa dạng.", c: "Tính khách quan, tính phổ biến, tính kế thừa.", d: "Tính khách quan, tính phổ biến, tính kế thừa, tính đa dạng, phong phú.", dung: "D" },
+  { cau: "Các hình thức tồn tại của vật chất?", a: "Vận động, không gian và thời gian", b: "Phát triển, không gian và thời gian", c: "Vận động, phát triển, không gian và thời gian", d: "Chuyển động, không gian và thời gian", dung: "A" },
+  { cau: "Nhận thức lý tính đem lại cho con người tri thức gì?", a: "Cảm tính.", b: "Thông thường.", c: "Kinh nghiệm.", d: "Lý luận.", dung: "D" },
+  { cau: "Theo quan niệm của chủ nghĩa duy vật biện chứng, các mặt đối lập do đâu mà có?", a: "Vốn có của thế giới vật chất, không do ai sinh ra.", b: "Do quá trình lao động của con người sinh ra.", c: "Do các đấng siêu nhiên tạo ra.", d: "Do ý thức, cảm giác của con người tạo ra.", dung: "A" },
+  { cau: "Quan điểm cho rằng: 'Chúng ta chỉ nhận thức được các cảm giác của chúng ta thôi' của trường phái triết học nào?", a: "Chủ nghĩa duy tâm khách quan", b: "Chủ nghĩa duy tâm chủ quan", c: "Chủ nghĩa hoài nghi", d: "Thuyết không thể biết", dung: "B" },
+  { cau: "'Cơ sở của mối liên hệ giữa các sự vật hiện tượng là ở tính thống nhất vật chất của thế giới'. Luận điểm trên thuộc trường phái triết học nào?", a: "Chủ nghĩa duy vật siêu hình.", b: "Chủ nghĩa duy vật biện chứng.", c: "Chủ nghĩa duy vật chất phác.", d: "Chủ nghĩa duy tâm khách quan.", dung: "B" },
+  { cau: "Theo quan điểm của triết học Mác - Lênin, mục đích của nhận thức là gì?", a: "Phục vụ nhu cầu thực tiễn của con người", b: "Thỏa mãn sự hiểu biết của con người", c: "Giúp con người hiểu bản chất của mình", d: "Phục vụ hoạt động sản xuất", dung: "A" },
+  { cau: "Hoạt động thực tiễn khác với hoạt động nhận thức ở tính chất nào?", a: "Tính mục đích.", b: "Tính xã hội.", c: "Tính lịch sử.", d: "Tính vật chất.", dung: "D" },
+  { cau: "Theo quan niệm của V.I.Lênin: Vật chất là một phạm trù triết học dùng để chỉ cái gì?", a: "Thế giới.", b: "Thực tại khách quan.", c: "Một khái niệm.", d: "Đối tượng.", dung: "B" },
+  { cau: "Chọn phương án đúng nhất từ ý nghĩa phương pháp luận phạm trù tất nhiên và ngẫu nhiên?", a: "Trong hoạt động thực tiễn, chúng ta cần phải dựa vào cái ngẫu nhiên.", b: "Trong hoạt động thực tiễn, chúng ta cần phải dựa vào cái tất nhiên nhưng phải tính tới ngẫu nhiên.", c: "Trong hoạt động thực tiễn, chúng ta cần phải dựa vào cái tất nhiên.", d: "Trong hoạt động thực tiễn, chúng ta cần phải dựa vào cả cái tất nhiên và ngẫu nhiên.", dung: "B" },
+  { cau: "Tính chất đặc trưng của phép biện chứng mác xít là gì?", a: "Chất phác.", b: "Chủ quan.", c: "Duy tâm.", d: "Duy vật.", dung: "D" },
+  { cau: "Luận điểm của Lênin: 'Muốn thực sự hiểu được sự vật cần phải nhìn bao quát và nghiên cứu tất cả các mặt, tất cả các mối liên hệ và quan hệ gián tiếp của vật đó', thể hiện quan điểm nào trong nhận thức?", a: "Quan điểm phát triển.", b: "Quan điểm lịch sử - cụ thể.", c: "Quan điểm toàn diện.", d: "Quan điểm khách quan.", dung: "C" },
+  { cau: "Nội dung thể hiện tính thống nhất vật chất của thế giới?", a: "Chỉ có một thế giới duy nhất và đồng nhất về thế giới vật chất - thế giới tồn tại chủ quan, có trước và độc lập với ý thức con người, được ý thức con người phản ánh. Mọi bộ phận của thế giới có mối quan hệ vật chất thống nhất với nhau", b: "Chỉ có một thế giới duy nhất và đồng nhất về thế giới vật chất - thế giới tồn tại khách quan, có sau và độc lập với ý thức con người, được ý thức con người phản ánh. Mọi bộ phận của thế giới có mối quan hệ vật chất thống nhất với nhau", c: "Chỉ có một thế giới duy nhất và đồng nhất về thế giới vật chất - thế giới tồn tại khách quan, có trước và phụ thuộc với ý thức con người, được ý thức con người phản ánh. Mọi bộ phận của thế giới có mối quan hệ vật chất thống nhất với nhau", d: "Chỉ có một thế giới duy nhất và đồng nhất về thế giới vật chất - thế giới tồn tại khách quan, có trước và độc lập với ý thức con người, được ý thức con người phản ánh. Mọi bộ phận của thế giới có mối quan hệ vật chất thống nhất với nhau", dung: "D" },
+  { cau: "Nhận định nào về phủ định biện chứng là KHÔNG đúng?", a: "Phủ định có tính kế thừa.", b: "Phủ định đồng thời cũng là khẳng định.", c: "Phủ định có tính khách quan, phổ biến.", d: "Phủ định là chấm dứt sự phát triển.", dung: "D" },
+  { cau: "Luận điểm nào dưới đây thể hiện quan điểm duy vật biện chứng về không gian (KG) và thời gian (TG)?", a: "KG và TG là sản phẩm thuần túy của tư duy.", b: "KG chứa các sự vật, TG chứa các sự kiện.", c: "KG và TG không phụ thuộc vật chất.", d: "KG và TG là hình thức tồn tại của vật chất.", dung: "D" },
+  { cau: "Phạm trù triết học nào dùng để chỉ quá trình vận động từ đơn giản đến phức tạp, từ kém hoàn thiện đến hoàn thiện hơn của sự vật?", a: "Phát triển", b: "Mâu thuẫn", c: "Biện chứng", d: "Phủ định", dung: "A" },
+  { cau: "Vì sao vật chất quyết định nội dung phản ánh của ý thức?", a: "Bản chất của ý thức là sự phản ánh chủ quan của hiện thực chủ quan. Hay nói cách khác, hiện thực khách quan (vật chất) là 'nguyên liệu đầu vào' của việc hình thành ý thức nên quyết định ý thức", b: "Bản chất của ý thức là sự phản ánh chủ quan của hiện thực khách quan. Hay nói cách khác, hiện thực khách quan (vật chất) là 'nguyên liệu đầu vào' của việc hình thành ý thức nên quyết định ý thức", c: "Bản chất của ý thức là sự phản ánh khách quan của hiện thực chủ quan. Hay nói cách khác, hiện thực khách quan (vật chất) là 'nguyên liệu đầu vào' của việc hình thành ý thức nên quyết định ý thức", d: "Bản chất của ý thức là sự phản ánh khách quan của hiện thực khách quan. Hay nói cách khác, hiện thực khách quan (vật chất) là 'nguyên liệu đầu vào' của việc hình thành ý thức nên quyết định ý thức", dung: "B" },
+  { cau: "Ý thức phản ánh hiện thực vào óc người. Tại sao cùng một sự vật hiện tượng, mỗi người khác nhau lại có cách hiểu không giống nhau, thậm chí trái ngược nhau?", a: "Nội dung phản ánh của ý thức mang tính chủ quan, do thế giới khách quan quy định. Kết quả phản ánh ý thức mang tính khách quan của chủ thể phản ánh", b: "Nội dung phản ánh của ý thức mang tính khách quan, do thế giới khách quan quy định. Kết quả phản ánh của ý thức mang tính chủ quan của chủ thể phản ánh", c: "Nội dung phản ánh của ý thức mang tính chủ quan, do thế giới khách quan quy định. Kết quả phản ánh ý thức mang tính chủ quan của chủ thể phản ánh", d: "Nội dung phản ánh của ý thức mang tính khách quan, do thế giới khách quan quy định. Kết quả phản ánh ý thức mang tính chủ quan của chủ thể phản ánh", dung: "B" },
+  { cau: "Quan niệm nào là đúng về 'chất' của sự vật?", a: "Một thuộc tính nổi bật của sự vật.", b: "Thuộc tính cơ bản của sự vật.", c: "Trình độ, quy mô của sự vật.", d: "Tổng hợp các thuộc tính cơ bản của sự vật", dung: "D" },
+  { cau: "Người đưa ra định nghĩa hoàn chỉnh về vật chất là ai?", a: "Ph.Ăngghen.", b: "C.Mác.", c: "L.Phoiơbắc.", d: "V.I.Lênin.", dung: "D" },
+  { cau: "Những nguyên tắc đòi hỏi trong nhận thức sự vật, cần phải đặt nó trong một không gian, thời gian, bối cảnh nhất định mà sự vật đó tồn tại gọi là gì?", a: "Quan điểm toàn diện.", b: "Quan điểm duy vật.", c: "Quan điểm phát triển.", d: "Quan điểm lịch sử - cụ thể.", dung: "D" },
+  { cau: "Theo V.I.Lênin, vật chất là gì?", a: "Thực tại khách quan - cái tồn tại hiện thực bên ngoài ý thức và không lệ thuộc vào ý thức, tác động vào các giác quan con người đem lại cho con người cảm giác", b: "Tất cả mọi thứ xung quanh mà con người có thể cảm nhận được", c: "Một dạng thức đặc biệt của ý thức", d: "Thực tại khách quan - cái tồn tại hiện thực bên ngoài ý thức và lệ thuộc vào ý thức, tác động vào các giác quan con người đem lại cho con người cảm giác", dung: "A" },
+  { cau: "Những yếu tố nào đóng vai trò quyết định trong sự hình thành biểu tượng?", a: "Ấn tượng, giấc mơ.", b: "Cảm giác, tri giác.", c: "Ấn tượng, trí nhớ.", d: "Trí nhớ, giấc mơ.", dung: "B" },
+  { cau: "Trình độ nhận thức nào gián tiếp, trừu tượng, có tính hệ thống trong việc khái quát bản chất, quy luật của các sự vật, hiện tượng?", a: "Nhận thức thông thường.", b: "Nhận thức kinh nghiệm.", c: "Nhận thức khoa học.", d: "Nhận thức lý luận.", dung: "D" },
+  { cau: "Theo triết học Mác - Lênin, sự tác động của ý thức đến vật chất được thể hiện thông qua hoạt động nào?", a: "Hoạt động lý luận.", b: "Hoạt động nghiên cứu khoa học.", c: "Hoạt động thực tiễn.", d: "Hoạt động tư duy của con người.", dung: "C" },
+  { cau: "Hạn chế cơ bản trong quan niệm về vật chất của các nhà triết học duy vật cận đại là gì?", a: "Đồng nhất vật chất với khối lượng.", b: "Đồng nhất vật chất với sự vật cảm tính.", c: "Coi vật chất là những gì tồn tại khách quan", d: "Coi vật chất là tự thân vận động.", dung: "A" },
+  { cau: "Quan niệm về vật chất của chủ nghĩa duy vật trước Mác là gì?", a: "Không có quan niệm về vật chất", b: "Thời cận đại: Đồng nghĩa vật chất với khối lượng", c: "Thời cổ đại: Đồng nghĩa vật chất với vật thể", d: "Thời cổ đại: Đồng nghĩa vật chất với vật thể. Thời cận đại: Đồng nghĩa vật chất với khối lượng", dung: "D" },
+  { cau: "Theo quan điểm triết học Mác - Lênin, sự ra đời của ý thức có nguồn gốc sâu xa là gì?", a: "Bộ óc con người.", b: "Ngôn ngữ.", c: "Lao động.", d: "Sự phát triển của giới tự nhiên.", dung: "D" },
+  { cau: "Khi viết: 'Loài vật giỏi lắm thì cũng chỉ biết hái lượm là cùng, con người thì biết sản xuất, con người chế tạo ra những tư liệu sinh sống' Ph.Ăngghen nhấn mạnh nhân tố gì đánh dấu sự khác biệt giữa con người với loài vật?", a: "Ngôn ngữ.", b: "Tâm lý.", c: "Bản năng.", d: "Ý thức.", dung: "D" },
+  { cau: "Không gian và thời gian của hệ mặt trời là...", a: "Trường tồn", b: "Bất ổn định", c: "Vô hạn", d: "Hữu hạn", dung: "D" },
+  { cau: "Hình thái nào KHÔNG thuộc nhận thức lý tính?", a: "Cảm giác.", b: "Suy luận.", c: "Khái niệm.", d: "Phán đoán.", dung: "A" },
+  { cau: "Hoàn thiện luận điểm của Ph.Ăngghen: 'Phép biện chứng chẳng qua chỉ là môn khoa học về những … của sự vận động và phát triển thế giới'?", a: "quy luật phổ biến.", b: "quy luật chung.", c: "quy luật đặc thù.", d: "quy luật riêng.", dung: "A" },
+  { cau: "Yếu tố nào sau đây KHÔNG phản ánh mối quan hệ giữa chủ thể và khách thể trong quá trình nhận thức?", a: "Đối tượng nhận thức.", b: "Khách thể nhận thức.", c: "Chủ thể nhận thức.", d: "Hình thức nhận thức.", dung: "D" },
+  { cau: "Theo quan điểm của chủ nghĩa duy vật biện chứng, khái niệm là gì?", a: "Sự liên kết các tri giác.", b: "Hình thức nhận thức cảm tính.", c: "Hình thức tư duy trừu tượng.", d: "Sự liên kết các cảm giác.", dung: "C" },
+  { cau: "Theo Talét, khởi nguyên của thế giới là gì?", a: "Lửa.", b: "Nước.", c: "Không khí.", d: "Đất.", dung: "B" },
+  { cau: "Theo quan điểm của chủ nghĩa duy vật biện chứng, sự thống nhất giữa các mặt đối lập có những biểu hiện gì?", a: "Sự bài trừ, phủ định nhau.", b: "Sự đồng nhất, có những điểm chung giữa hai mặt đối lập.", c: "Sự tác động ngang bằng nhau.", d: "Sự cùng tồn tại, nương tựa nhau.", dung: "D" },
+  { cau: "Theo chủ nghĩa duy vật biện chứng, quan điểm nào về chân lý là đúng?", a: "Chân lý là hình ảnh chủ quan của thế giới khách quan.", b: "Chân lý là tri thức phù hợp với hiện thực khách quan và được thực tiễn kiểm nghiệm.", c: "Chân lý là tri thức được số đông thừa nhận.", d: "Chân lý là sản phẩm sáng tạo thuần túy của tư duy con người.", dung: "B" },
+  { cau: "Trong các cặp phạm trù dưới đây cặp phạm trù nào là quan hệ nhân quả?", a: "Bão - Cây đổ.", b: "Phải - Trái.", c: "Ngày - Đêm.", d: "Thu - Đông.", dung: "A" },
+  { cau: "Phạm trù triết học dùng để chỉ những gì đang có, đang tồn tại thực sự, gọi là gì?", a: "Khả năng.", b: "Kết quả.", c: "Nguyên nhân.", d: "Hiện thực.", dung: "D" },
+  { cau: "Nội dung nguyên lý về mối liên hệ phổ biến?", a: "Các sự vật, hiện tượng không có mối liên hệ với nhau", b: "Các sự vật, hiện tượng của thế giới tồn tại trong mối liên hệ qua lại với nhau", c: "Các sự vật, hiện tượng của thế giới tồn tại trong mối liên hệ qua lại với nhau, quy định lẫn nhau, thâm nhập, chuyển hóa lẫn nhau, không tách biệt nhau", d: "Các sự vật, hiện tượng của thế giới tồn tại trong mối liên hệ qua lại với nhau, quy định lẫn nhau, thâm nhập, chuyển hóa lẫn nhau, tách biệt nhau", dung: "C" },
+  { cau: "Theo thứ tự từ trái qua phải, các cấp độ nhận thức từ thấp đến cao, cách sắp xếp nào là đúng?", a: "Cảm tính - Lý tính.", b: "Lý tính - Khoa học.", c: "Lý luận - Kinh nghiệm.", d: "Lý luận - Cảm tính.", dung: "A" },
+  { cau: "Bệnh giáo điều là khuynh hướng tư tưởng và hành động cường điệu yếu tố nào?", a: "Cường điệu lý luận, coi nhẹ thực tiễn.", b: "Cường điệu thực tiễn, coi nhẹ lý luận.", c: "Cường điệu kinh nghiệm cuộc sống.", d: "Cường điệu nhận thức thông thường.", dung: "A" },
+  { cau: "Nếu bộ óc người tách khỏi thế giới khách quan thì...", a: "Không thể hình thành ý thức", b: "Không thể hình thành tiềm thức", c: "Có thể hình thành ý thức", d: "Có thể hình thành tiềm thức", dung: "A" },
+  { cau: "Theo quan điểm triết học Mác - Lênin, tiêu chuẩn của chân lý là gì?", a: "Hoạt động chính trị.", b: "Thực nghiệm khoa học.", c: "Lao động sản xuất.", d: "Hoạt động thực tiễn.", dung: "D" },
+  { cau: "Nếu sắp xếp các hình thức vận động của vật chất từ thấp đến cao và từ trái qua phải, thì cách sắp xếp nào dưới đây KHÔNG đúng?", a: "Sinh học - Hóa học.", b: "Sinh học - Xã hội.", c: "Cơ học - Vật lý.", d: "Vật lý - Hóa học.", dung: "A" },
+  { cau: "Trong quy luật 'Lượng - Chất', tính quy định phản ánh quy mô, trình độ phát triển của sự vật, hiện tượng được gọi là gì?", a: "Chất.", b: "Lượng.", c: "Điểm nút.", d: "Độ", dung: "B" },
+  { cau: "Với tư cách là một phạm trù triết học, phương diện nào sau đây của bức tranh biểu hiện về mặt nội dung của nó?", a: "Kết cấu họa tiết.", b: "Chủ đề phản ánh.", c: "Màu sắc thể hiện.", d: "Bố cục khuôn hình.", dung: "B" },
+  { cau: "Chọn phương án đúng: Hoàn thành định nghĩa: 'Cái riêng là phạm trù triết học dùng để chỉ…'?", a: "một sự vật thuộc về người cụ thể.", b: "một nét đặc thù có ở một sự vật.", c: "một đặc điểm lặp lại ở các sự vật.", d: "một sự vật, hiện tượng nhất định.", dung: "D" },
+  { cau: "Trong mối quan hệ giữa vật chất và ý thức, ý thức có vai trò gì?", a: "Tác động trực tiếp tới ý thức", b: "Có khả năng tự chuyển thành hình thức vật chất nhất định để tác động vào hình thức vật chất khác", c: "Không có vai trò đối với vật chất, vì hoàn toàn phụ thuộc vào vật chất", d: "Tác động đến vật chất thông qua hoạt động thực tiễn của con người", dung: "D" },
+  { cau: "Nguyên tắc nào KHÔNG phải là ý nghĩa phương pháp luận rút ra từ chủ nghĩa duy vật biện chứng?", a: "Trong hoạt động nhận thức và thực tiễn cần tôn trọng quan điểm thực tiễn.", b: "Trong hoạt động nhận thức và thực tiễn cần tuyệt đối hóa phương diện lý luận.", c: "Trong hoạt động nhận thức và thực tiễn cần xuất phát từ thực tế khách quan.", d: "Trong hoạt động nhận thức và thực tiễn cần phát huy tính năng động chủ quan.", dung: "B" },
+  { cau: "Khái niệm nào dùng để chỉ sự chuyển hóa về chất do sự biến đổi trước đó về lượng tới giới hạn điểm nút?", a: "Độ.", b: "Bước nhảy.", c: "Phát triển.", d: "Vận động.", dung: "B" },
+  { cau: "Nguồn gốc xã hội nào được coi là trực tiếp và quan trọng nhất quyết định sự ra đời của ý thức?", a: "Lao động trí óc.", b: "Hoạt động thực tiễn.", c: "Nghiên cứu khoa học.", d: "Giáo dục.", dung: "B" },
+  { cau: "Sự tự phủ định để đưa sự vật dường như quay lại điểm xuất phát ban đầu trong phép biện chứng được gọi là gì?", a: "Phủ định siêu hình.", b: "Phủ định biện chứng.", c: "Phủ định của phủ định.", d: "Chuyển hóa.", dung: "C" },
+  { cau: "Luận điểm 'Ý thức là thuộc tính của một dạng vật chất có tổ chức cao là bộ óc con người' thuộc trường phái nào?", a: "Chủ nghĩa duy tâm khách quan.", b: "Chủ nghĩa duy vật siêu hình.", c: "Chủ nghĩa duy vật tầm thường.", d: "Chủ nghĩa duy vật biện chứng.", dung: "D" },
+  { cau: "Sai lầm của chủ nghĩa duy vật cổ đại là ở chỗ đã đồng nhất vật chất nói chung với yếu tố nào?", a: "Khối lượng.", b: "Sự vật cảm tính.", c: "Thực thể tinh thần.", d: "Nguyên tử.", dung: "B" },
+  { cau: "Theo lý luận nhận thức của triết học Mác - Lênin, hình ảnh gián tiếp trong giai đoạn nhận thức cảm tính gọi là gì?", a: "Cảm giác.", b: "Biểu tượng.", c: "Khái niệm.", d: "Tri giác.", dung: "B" },
+  { cau: "Theo phép biện chứng duy vật, luận điểm nào dưới đây là KHÔNG đúng?", a: "Phát triển bao hàm trong đó cả những bước thụt lùi.", b: "Không phải mọi sự vận động đều là phát triển.", c: "Phát triển là vận động theo hướng từ thấp lên cao.", d: "Phát triển là sự tăng lên về lượng, ổn định về chất.", dung: "D" },
+  { cau: "Quan điểm triết học về nhận thức của chủ nghĩa hoài nghi là như thế nào?", a: "Nghi ngờ khả năng nhận thức của con người.", b: "Con người không có khả năng nhận thức được thế giới.", c: "Nhận thức của con người về sự vật chỉ là những hình ảnh bên ngoài của chúng chứ không phải là bản thân sự vật.", d: "Con người có khả năng nhận thức được thế giới.", dung: "A" },
+  { cau: "Đâu là bản chất của ý thức?", a: "Sự phản ánh nguyên vẹn hiện thực khách quan vào trong bộ óc con người. Hình ảnh khách của thế giới khách quan", b: "Sự phản ánh nguyên vẹn hiện thực khách quan vào trong bộ óc con người. Hình ảnh chủ quan của thế giới khách quan", c: "Sự phản ánh hiện thực khách quan vào trong bộ óc con người một cách năng động, sáng tạo. Hình ảnh chủ quan của thế giới khách quan", d: "Sự phản ánh hiện thực khách quan vào trong bộ óc con người một cách năng động, sáng tạo. Hình ảnh khách quan của thế giới khách quan", dung: "C" },
+  { cau: "Theo Đêmôcrít, khởi nguyên của thế giới là gì?", a: "Nước.", b: "Không khí.", c: "Lửa.", d: "Nguyên tử.", dung: "D" },
+  { cau: "Theo quan điểm của chủ nghĩa duy vật biện chứng, vật chất với tư cách là phạm trù triết học có đặc tính gì?", a: "Vô hạn, có sinh ra và mất đi", b: "Có giới hạn, có sinh ra và mất đi", c: "Vô hạn, vô tận, tồn tại vĩnh viễn, độc lập với ý thức", d: "Vô hạn, vô tận, vĩnh viễn tồn tại", dung: "C" },
+  { cau: "Trình độ nhận thức nào được hình thành từ sự quan sát trực tiếp các sự vật, hiện tượng trong giới tự nhiên, xã hội hoặc qua các thí nghiệm khoa học?", a: "Nhận thức lý luận.", b: "Nhận thức khoa học.", c: "Nhận thức kinh nghiệm.", d: "Nhận thức thông thường.", dung: "C" },
+  { cau: "Trường phái triết học nào cho rằng: Sự vật chỉ là kết quả của sự phức hợp các cảm giác của con người?", a: "Chủ nghĩa duy vật biện chứng.", b: "Chủ nghĩa duy tâm khách quan.", c: "Chủ nghĩa duy tâm chủ quan.", d: "Chủ nghĩa duy vật siêu hình.", dung: "C" },
+  { cau: "Theo quan niệm của triết học Mác - Lênin, để trở thành mặt đối lập của mâu thuẫn, các mặt đối lập phải...", a: "Thống nhất biện chứng với nhau", b: "Liên tục đấu tranh với nhau", c: "Vừa liên hệ với nhau, vừa đấu tranh với nhau", d: "Vừa thống nhất với nhau, vừa đấu tranh với nhau", dung: "D" },
+  { cau: "Quan điểm coi vô thức là một hiện tượng tâm lý cô lập, hoàn toàn tách khỏi hoàn cảnh xã hội xung quanh và không có liên quan gì đến ý thức. Đúng hay sai?", a: "Đúng", b: "Sai", dung: "B" },
+  { cau: "Quan điểm toàn diện là ý nghĩa phương pháp luận được rút ra từ cơ sở nào của phép biện chứng duy vật?", a: "Quy luật phủ định của phủ định.", b: "Quy luật mâu thuẫn.", c: "Nguyên lý về mối liên hệ phổ biến.", d: "Nguyên lý về sự phát triển.", dung: "C" },
+  { cau: "Quy luật phủ định của phủ định trong phép biện chứng duy vật chỉ ra phương diện nào của sự phát triển?", a: "Nguồn gốc của sự phát triển.", b: "Khuynh hướng của sự phát triển.", c: "Động lực của sự phát triển.", d: "Cách thức của sự phát triển.", dung: "B" },
+  { cau: "Phạm trù triết học dùng để chỉ tổng hợp sự tác động qua lại giữa các mặt trong một sự vật hoặc giữa các sự vật với nhau, gây nên những biến đổi nhất định, gọi là gì?", a: "Kết quả.", b: "Phủ định.", c: "Phát triển.", d: "Nguyên nhân.", dung: "D" },
+  { cau: "Sự tác động qua lại giữa các nguyên tố, quá trình hóa hợp, phân giải thuộc loại hình vận động nào?", a: "Vật lý.", b: "Sinh học.", c: "Hóa học.", d: "Cơ học.", dung: "C" },
+  { cau: "Hình thức nhận thức nào được hình thành dựa trên sự liên kết các phán đoán?", a: "Suy luận.", b: "Tri giác.", c: "Phán đoán.", d: "Biểu tượng.", dung: "A" },
+  { cau: "Sự vận dụng các khái niệm để khẳng định hoặc phủ định một thuộc tính, một mối liên hệ nào đó của hiện thực khách quan được gọi là gì?", a: "Tổng hợp.", b: "Tưởng tượng.", c: "Phán đoán.", d: "Suy luận.", dung: "C" }
+];
+
+let list = data.slice(), idx = 0, score = 0;
+
+function show() {
+  let item = list.at(idx);
+  document.getElementById("num").innerText = "Câu " + (idx + 1) + "/" + list.length;
+  document.getElementById("pts").innerText = "Điểm: " + score;
+  document.getElementById("q").innerText = item.cau;
+  document.getElementById("nxt").style.display = "none";
+  
+  document.getElementById("opts").innerHTML = `
+    <button class="opt cA" id="btnA" onclick="pick('A')">A. ${item.a}</button>
+    <button class="opt cB" id="btnB" onclick="pick('B')">B. ${item.b}</button>
+    <button class="opt cC" id="btnC" onclick="pick('C')">C. ${item.c}</button>
+    <button class="opt cD" id="btnD" onclick="pick('D')">D. ${item.d}</button>
+  `;
+}
+
+function pick(chon) {
+  let item = list.at(idx);
+  let cacNut = ["A", "B", "C", "D"];
+  
+  cacNut.forEach(chu => {
+    let nut = document.getElementById("btn" + chu);
+    nut.disabled = true;
+    if (chu === item.dung) nut.classList.add("ok");
+    else if (chu === chon) nut.classList.add("no");
+  });
+
+  if (chon === item.dung) score++;
+  document.getElementById("pts").innerText = "Điểm: " + score;
+  document.getElementById("nxt").style.display = "inline-block";
+}
+
+function next() {
+  idx++;
+  if (idx < list.length) show();
+  else document.getElementById("app").innerHTML = `<h2>🎉 Hoàn thành Phần 1!</h2><p style="font-size:22px">Điểm của bạn: <b>${score}/${list.length}</b></p><button class="btn" onclick="location.reload()">Làm lại</button>`;
+}
+
+function mix() {
+  list = data.slice().sort(() => Math.random() - 0.5);
+  idx = 0; score = 0; show();
+}
+
+show();
+</script>
+</body>
+</html>
